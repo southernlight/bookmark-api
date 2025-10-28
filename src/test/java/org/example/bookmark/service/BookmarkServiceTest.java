@@ -2,13 +2,17 @@ package org.example.bookmark.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.assertj.core.api.Assertions;
 import org.example.bookmark.common.exception.BusinessException;
 import org.example.bookmark.common.exception.ErrorCode;
@@ -19,6 +23,7 @@ import org.example.bookmark.entity.Member;
 import org.example.bookmark.entity.Tag;
 import org.example.bookmark.repository.BookmarkRepository;
 import org.example.bookmark.repository.MemberRepository;
+import org.example.bookmark.repository.TagRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +40,9 @@ public class BookmarkServiceTest {
 
     @Mock
     MemberRepository memberRepository;
+
+    @Mock
+    TagRepository tagRepository;
 
     @InjectMocks
     BookmarkService bookmarkService;
@@ -77,7 +85,14 @@ public class BookmarkServiceTest {
 
       // given
       Member member = createMember(MEMBER_ID);
-      Bookmark bookmark = createBookmark(BOOKMARK_ID, member);
+
+      Tag tag1 = createTag(1L, "포털");
+      Tag tag2 = createTag(2L, "검색");
+      Set<Tag> tags = new HashSet<>();
+      tags.add(tag1);
+      tags.add(tag2);
+
+      Bookmark bookmark = createBookmark(BOOKMARK_ID,member,tags);
 
       mockFindBookmarkById(BOOKMARK_ID, Optional.of(bookmark));
 
@@ -91,6 +106,9 @@ public class BookmarkServiceTest {
       assertEquals("테스트 북마크", response.getTitle());
       assertEquals("https://example.com", response.getUrl());
       assertEquals("메모 내용", response.getMemo());
+
+      List<String> expectedTags = Arrays.asList("포털", "검색");
+      assertTrue(response.getTags().containsAll(expectedTags));
     }
 
     @Test
@@ -116,7 +134,7 @@ public class BookmarkServiceTest {
 
       // given
       Member otherMember = createMember(OTHER_MEMBER_ID);
-      Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember);
+      Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember,null);
 
       mockFindBookmarkById(BOOKMARK_ID, Optional.of(bookmark));
 
@@ -137,10 +155,11 @@ public class BookmarkServiceTest {
     // given
     BookmarkRequest request = createBookmarkRequest(true);
     Member member =  createMember(MEMBER_ID);
-    Bookmark existingBookmark = createBookmark(BOOKMARK_ID, member);
+    Bookmark existingBookmark = createBookmark(BOOKMARK_ID, member,null);
 
     mockFindBookmarkById(BOOKMARK_ID, Optional.of(existingBookmark));
     mockSaveBookmark();
+    mockSaveTag();
 
     // when
     BookmarkResponse response = bookmarkService.updateBookmark(MEMBER_ID, BOOKMARK_ID, request);
@@ -182,7 +201,7 @@ public class BookmarkServiceTest {
 
     // given
     Member otherMember = createMember(OTHER_MEMBER_ID);
-    Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember);
+    Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember,null);
 
     mockFindBookmarkById(BOOKMARK_ID, Optional.of(bookmark));
 
@@ -203,7 +222,7 @@ public class BookmarkServiceTest {
 
     // given
     Member member = createMember(MEMBER_ID);
-    Bookmark bookmark =  createBookmark(BOOKMARK_ID, member);
+    Bookmark bookmark =  createBookmark(BOOKMARK_ID, member,null);
 
     mockFindBookmarkById(BOOKMARK_ID, Optional.of(bookmark));
 
@@ -239,7 +258,7 @@ public class BookmarkServiceTest {
 
     // given
     Member otherMember = createMember(OTHER_MEMBER_ID);
-    Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember);
+    Bookmark bookmark = createBookmark(BOOKMARK_ID, otherMember,null);
 
     mockFindBookmarkById(BOOKMARK_ID, Optional.of(bookmark));
 
@@ -275,14 +294,22 @@ public class BookmarkServiceTest {
         .build();
   }
 
-  private Bookmark createBookmark(Long bookmarkId, Member member) {
+  public static Bookmark createBookmark(Long bookmarkId, Member member, Set<Tag> tags) {
     return Bookmark.builder()
         .id(bookmarkId)
+        .member(member)
         .title("테스트 북마크")
         .url("https://example.com")
         .memo("메모 내용")
-        .member(member)
+        .tags(tags != null ? tags : new HashSet<>())
         .build();
+  }
+
+  public static Tag createTag(Long tagId,String tagName) {
+      return Tag.builder()
+          .id(tagId)
+          .name(tagName)
+          .build();
   }
 
   private Member createMember(Long memberId) {
@@ -303,6 +330,11 @@ public class BookmarkServiceTest {
     when(bookmarkRepository.save(any(Bookmark.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
   }
+
+  private void mockSaveTag() {
+    when(tagRepository.save(any(Tag.class))).thenAnswer(invocation -> invocation.getArgument(0));
+  }
+
 
   private void assertBookmarkTags(Bookmark bookmark, List<String> expectedTagNames) {
     Assertions.assertThat(bookmark.getTags())
