@@ -62,6 +62,7 @@ public class BookmarkServiceTest {
 
       mockFindMemberById(MEMBER_ID, member);
       mockSaveBookmark();
+      mockSaveTag();
 
       // when
       bookmarkService.registerBookmark(MEMBER_ID,request);

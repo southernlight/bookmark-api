@@ -14,6 +14,7 @@ import org.example.bookmark.entity.Member;
 import org.example.bookmark.entity.Tag;
 import org.example.bookmark.repository.BookmarkRepository;
 import org.example.bookmark.repository.MemberRepository;
+import org.example.bookmark.repository.TagRepository;
 import org.example.bookmark.service.BookmarkService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,9 @@ class BookmarkApplicationTests {
   @Autowired
   private MemberRepository memberRepository;
 
+  @Autowired
+  private TagRepository tagRepository;
+
   private Long member1Id;
 
   @BeforeEach
@@ -41,33 +45,31 @@ class BookmarkApplicationTests {
 
     memberRepository.deleteAll();
     bookmarkRepository.deleteAll();
+    tagRepository.deleteAll();
 
+    Member member1 = memberRepository.save(Member.builder()
+        .email("user1@example.com")
+        .password("password1")
+        .build());
 
-    Member member1 = memberRepository.save(
-        Member.builder()
-            .email("user1@example.com")
-            .password("password1")
-            .build()
-    );
-
-
-    Member member2 = memberRepository.save(
-        Member.builder()
-            .email("user2@example.com")
-            .password("password2")
-            .build()
-    );
+    Member member2 = memberRepository.save(Member.builder()
+        .email("user2@example.com")
+        .password("password2")
+        .build());
 
     member1Id = member1.getId();
 
-    memberRepository.saveAll(List.of(member1, member2));
+    // 태그를 미리 저장
+    Tag tagSearch = tagRepository.save(Tag.builder().name("검색").build());
+    Tag tagPortal = tagRepository.save(Tag.builder().name("포털").build());
+    Tag tagAd = tagRepository.save(Tag.builder().name("광고").build());
 
     Bookmark b1 = Bookmark.builder()
         .title("네이버")
         .url("https://naver.com")
         .memo("포털")
         .member(member1)
-        .tags(Set.of(Tag.builder().name("검색").build()))
+        .tags(Set.of(tagSearch))
         .build();
 
     Bookmark b2 = Bookmark.builder()
@@ -75,7 +77,7 @@ class BookmarkApplicationTests {
         .url("https://google.com")
         .memo("검색 엔진")
         .member(member1)
-        .tags(Set.of(Tag.builder().name("검색").build(), Tag.builder().name("광고").build(), Tag.builder().name("포털").build()))
+        .tags(Set.of(tagSearch, tagAd, tagPortal))
         .build();
 
     Bookmark b3 = Bookmark.builder()
@@ -83,7 +85,7 @@ class BookmarkApplicationTests {
         .url("https://daum.net")
         .memo("포털 사이트")
         .member(member1)
-        .tags(Set.of(Tag.builder().name("포털").build()))
+        .tags(Set.of(tagPortal))
         .build();
 
     Bookmark b4 = Bookmark.builder()
@@ -91,9 +93,8 @@ class BookmarkApplicationTests {
         .url("https://naver2.com")
         .memo("포털2")
         .member(member2)
-        .tags(Set.of(Tag.builder().name("검색").build()))
+        .tags(Set.of(tagSearch))
         .build();
-
 
     bookmarkRepository.saveAll(List.of(b1, b2, b3, b4));
   }
