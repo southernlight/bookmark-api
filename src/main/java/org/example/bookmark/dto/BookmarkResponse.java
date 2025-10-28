@@ -2,6 +2,7 @@ package org.example.bookmark.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -27,5 +28,8 @@ public class BookmarkResponse {
 
   @Schema(description = "수정 시각", example = "2025-10-27T18:05:00")
   private LocalDateTime updatedAt;
+
+  @Schema(description = "북마크에 추가된 태그 목록", example = "[\"포털\", \"검색\"]")
+  private List<String> tags;
 
 }

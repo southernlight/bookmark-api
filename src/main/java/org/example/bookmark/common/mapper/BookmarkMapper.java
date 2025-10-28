@@ -18,6 +18,9 @@ public class BookmarkMapper {
         .title(bookmark.getTitle())
         .url(bookmark.getUrl())
         .memo(bookmark.getMemo())
+        .tags(bookmark.getTags().stream()
+            .map(Tag::getName)
+            .toList())
         .createdAt(bookmark.getCreatedAt())
         .updatedAt(bookmark.getUpdatedAt())
         .build();

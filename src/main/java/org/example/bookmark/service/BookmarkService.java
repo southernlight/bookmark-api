@@ -3,8 +3,12 @@ package org.example.bookmark.service;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.example.bookmark.common.mapper.BookmarkMapper;
 import org.example.bookmark.common.exception.BusinessException;
@@ -16,8 +20,10 @@ import org.example.bookmark.entity.Bookmark;
 import org.example.bookmark.entity.Member;
 import org.example.bookmark.entity.QBookmark;
 import org.example.bookmark.entity.QTag;
+import org.example.bookmark.entity.Tag;
 import org.example.bookmark.repository.BookmarkRepository;
 import org.example.bookmark.repository.MemberRepository;
+import org.example.bookmark.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -28,6 +34,7 @@ public class BookmarkService {
 
   private final BookmarkRepository bookmarkRepository;
   private final MemberRepository memberRepository;
+  private final TagRepository tagRepository;
   private final JPAQueryFactory queryFactory;
 
   @Transactional
@@ -52,11 +59,19 @@ public class BookmarkService {
     BooleanExpression predicate = criteria.toPredicate(bookmark);
     predicate = predicate.and(bookmark.member.id.eq(memberId));
 
-    List<Bookmark> bookmarkList = queryFactory
-        .selectFrom(bookmark)
+    List<Long> bookmarkIds = queryFactory
+        .select(bookmark.id)
+        .from(bookmark)
         .where(predicate)
         .offset(criteria.toPageable().getOffset())
         .limit(criteria.toPageable().getPageSize())
+        .fetch();
+
+    List<Bookmark> bookmarkList = queryFactory
+        .selectFrom(bookmark)
+        .leftJoin(bookmark.tags, tag).fetchJoin()
+        .where(bookmark.id.in(bookmarkIds))
+        .distinct()
         .fetch();
 
     long total = Optional.ofNullable(
@@ -91,7 +106,9 @@ public class BookmarkService {
     bookmark.setTitle(request.getTitle());
     bookmark.setUrl(request.getUrl());
     bookmark.setMemo(request.getMemo());
-    bookmark.setTags(BookmarkMapper.toTagSet(request.getTags()));
+
+    Set<Tag> tags = getOrCreateTags(request.getTags());
+    bookmark.setTags(tags);
 
     Bookmark updatedBookmark = bookmarkRepository.save(bookmark);
     return BookmarkMapper.toBookmarkResponse(updatedBookmark);
@@ -123,5 +140,21 @@ public class BookmarkService {
     if (!bookmark.getMember().getId().equals(memberId)) {
       throw new BusinessException(ErrorCode.UNAUTHORIZED_ACCESS);
     }
+  }
+
+  // 추출된 private 메서드
+  private Set<Tag> getOrCreateTags(List<String> tagNames) {
+    if (tagNames == null) {
+      return Collections.emptySet();
+    }
+
+    return tagNames.stream()
+        .map(tagName -> tagRepository.findByName(tagName)
+            .orElseGet(() -> {
+              Tag newTag = new Tag();
+              newTag.setName(tagName);
+              return tagRepository.save(newTag);
+            }))
+        .collect(Collectors.toSet());
   }
 }
