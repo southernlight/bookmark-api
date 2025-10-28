@@ -1,5 +1,6 @@
 package org.example.bookmark.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.bookmark.common.response.ApiResponse;
@@ -61,7 +62,7 @@ public class BookmarkController implements BookmarkControllerDocs {
   public ResponseEntity<ApiResponse<BookmarkResponse>> updateBookmarkById(
       @RequestAttribute("LOGIN_MEMBER_ID") Long memberId,
       @PathVariable("id") Long bookmarkId,
-      @RequestBody BookmarkRequest request) {
+      @RequestBody @Valid BookmarkRequest request) {
 
     BookmarkResponse response = bookmarkService.updateBookmark(memberId, bookmarkId, request);
     return ApiResponse.of(SuccessCode.OK, response);

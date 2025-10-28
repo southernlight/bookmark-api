@@ -2,6 +2,8 @@ package org.example.bookmark.controller.docs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.bookmark.common.response.ApiResponse;
@@ -114,7 +116,7 @@ public interface BookmarkControllerDocs {
         북마크 ID로 특정 북마크를 갱신합니다.<br><br>
         
         ⚡ <b>주의 사항</b><br>
-        - 일부 필드만 변경할 경우에도 전체 객체를 포함해야 합니다.<br>
+        - 북마크 title과 url은 필수값입니다. 나머지 값을 넣지 않으면, 필드가 null로 변경 됩니다.<br>
         - 북마크 갱신은 본인 계정의 북마크만 가능합니다.<br><br>
         """)
   @ApiResponses({
@@ -124,7 +126,34 @@ public interface BookmarkControllerDocs {
       ),
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "400",
-          ref = "#/components/responses/BookmarkNotFound"
+          description = "북마크 ID 없음 또는 필수값 누락",
+          content = @Content(
+              mediaType = "application/json",
+              examples = {
+                  @ExampleObject(
+                      name = "북마크 존재하지 않음",
+                      description = "해당 ID의 북마크를 찾을 수 없는 경우",
+                      value = """
+                        {
+                          "status": 400,
+                          "message": "해당 ID의 북마크를 찾을 수 없습니다.",
+                          "data": null
+                        }
+                        """
+                  ),
+                  @ExampleObject(
+                      name = "필수값 누락",
+                      description = "title 또는 url이 누락된 경우 발생하는 검증 에러",
+                      value = """
+                        {
+                          "status": 400,
+                          "message": "title: 북마크 제목은 필수입니다., url: 북마크 URL은 필수입니다.",
+                          "data": null
+                        }
+                        """
+                  )
+              }
+          )
       ),
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "401",
