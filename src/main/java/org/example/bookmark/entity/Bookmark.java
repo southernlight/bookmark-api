@@ -51,7 +51,7 @@ public class Bookmark {
   @UpdateTimestamp
   private LocalDateTime updatedAt;
 
-  @ManyToMany(cascade = CascadeType.PERSIST)
+  @ManyToMany
   @JoinTable(
       name = "bookmark_tag",
       joinColumns = @JoinColumn(name = "bookmark_id"),

@@ -43,7 +43,10 @@ public class BookmarkService {
     Member member = findMemberById(memberId);
 
     Bookmark newBookmark = BookmarkMapper.toBookmarkEntity(request);
+    Set<Tag> tags = getOrCreateTags(request.getTags());
+
     newBookmark.setMember(member);
+    newBookmark.setTags(tags);
 
     Bookmark savedBookmark = bookmarkRepository.save(newBookmark);
 
