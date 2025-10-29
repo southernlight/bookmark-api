@@ -13,6 +13,7 @@ public enum ErrorCode {
 
   BOOKMARK_NOT_FOUND(HttpStatus.BAD_REQUEST, "B001", "해당 ID의 북마크를 찾을 수 없습니다"),
   UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "B002", "본인 계정의 북마크가 아닙니다"),
+  UNSUPPORTED_SORT_FIELD(HttpStatus.BAD_REQUEST,"B003","지원하지 않는 정렬 필드입니다"),
 
   EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST,"A001" ,"이미 사용중인 이메일입니다."),
   INVALID_EMAIL_OR_PASSWORD(HttpStatus.BAD_REQUEST,"A002", "이메일 또는 비밀번호가 일치하지 않습니다"),

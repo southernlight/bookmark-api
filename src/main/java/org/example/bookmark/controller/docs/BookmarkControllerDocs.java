@@ -71,6 +71,21 @@ public interface BookmarkControllerDocs {
       ),
 
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
+          responseCode = "400",
+          description = "지원하지 않는 정렬 필드",
+          content = @Content(mediaType = "application/json",
+              examples = @ExampleObject(value = """
+        {
+          "status": 400,
+          "message": "지원하지 않는 정렬 필드입니다",
+          "data": null
+        }
+        """)
+          )
+      )
+,
+
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "500",
           ref = "#/components/responses/InternalServerError"
       )

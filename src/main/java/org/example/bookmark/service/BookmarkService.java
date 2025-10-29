@@ -1,5 +1,6 @@
 package org.example.bookmark.service;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
@@ -25,6 +26,7 @@ import org.example.bookmark.repository.MemberRepository;
 import org.example.bookmark.repository.TagRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,21 +60,29 @@ public class BookmarkService {
     QBookmark bookmark = QBookmark.bookmark;
     QTag tag = QTag.tag;
 
-    BooleanExpression predicate = criteria.toPredicate(bookmark);
-    predicate = predicate.and(bookmark.member.id.eq(memberId));
+    // 조건 생성
+    BooleanExpression predicate = criteria.toPredicate(bookmark)
+        .and(bookmark.member.id.eq(memberId));
+
+    // 정렬 생성
+    OrderSpecifier<?> orderSpecifier = criteria.toOrderSpecifier(bookmark);
+
+    // 페이징 정보
+    Pageable pageable = criteria.toPageable();
 
     List<Long> bookmarkIds = queryFactory
         .select(bookmark.id)
         .from(bookmark)
         .where(predicate)
-        .offset(criteria.toPageable().getOffset())
-        .limit(criteria.toPageable().getPageSize())
+        .offset(pageable.getOffset())
+        .limit(pageable.getPageSize())
         .fetch();
 
     List<Bookmark> bookmarkList = queryFactory
         .selectFrom(bookmark)
         .leftJoin(bookmark.tags, tag).fetchJoin()
         .where(bookmark.id.in(bookmarkIds))
+        .orderBy(orderSpecifier)
         .distinct()
         .fetch();
 
@@ -85,7 +95,7 @@ public class BookmarkService {
 
     List<BookmarkResponse> bookmarkResponseList = BookmarkMapper.toBookmarkResponseList(bookmarkList);
 
-    return new PageImpl<>(bookmarkResponseList,criteria.toPageable(),total);
+    return new PageImpl<>(bookmarkResponseList,pageable,total);
   }
 
   @Transactional

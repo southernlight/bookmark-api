@@ -1,9 +1,12 @@
 package org.example.bookmark.dto;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.example.bookmark.common.exception.BusinessException;
+import org.example.bookmark.common.exception.ErrorCode;
 import org.example.bookmark.entity.QBookmark;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +45,18 @@ public class BookmarkCriteria {
         .and(urlContains(url, bookmark));
   }
 
+  public OrderSpecifier<?> toOrderSpecifier(QBookmark bookmark) {
+    boolean isAsc = "asc".equalsIgnoreCase(direction);
+
+    return switch (sort) {
+      case "createdAt" -> isAsc ? bookmark.createdAt.asc() : bookmark.createdAt.desc();
+      case "id" -> isAsc ? bookmark.id.asc() : bookmark.id.desc();
+      default -> throw new BusinessException(ErrorCode.UNSUPPORTED_SORT_FIELD);
+    };
+  }
+
   public Pageable toPageable() {
-    Sort.Direction dir = Sort.Direction.fromString(direction.toUpperCase());
-    return PageRequest.of(page, size, Sort.by(dir,sort));
+    return PageRequest.of(page, size);
   }
 
   private BooleanExpression tagEquals(String tag, QBookmark bookmark) {
