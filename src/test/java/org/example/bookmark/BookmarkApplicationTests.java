@@ -1,9 +1,11 @@
 package org.example.bookmark;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,39 +66,38 @@ class BookmarkApplicationTests {
     Tag tagPortal = tagRepository.save(Tag.builder().name("포털").build());
     Tag tagAd = tagRepository.save(Tag.builder().name("광고").build());
 
-    Bookmark b1 = Bookmark.builder()
-        .title("네이버")
-        .url("https://naver.com")
-        .memo("포털")
-        .member(member1)
-        .tags(Set.of(tagSearch))
-        .build();
+    List<Bookmark> bookmarks = List.of(
+        Bookmark.builder()
+            .title("네이버")
+            .url("https://naver.com")
+            .memo("포털")
+            .member(member1)
+            .tags(Set.of(tagSearch))
+            .build(),
+        Bookmark.builder()
+            .title("구글")
+            .url("https://google.com")
+            .memo("검색 엔진")
+            .member(member1)
+            .tags(Set.of(tagSearch, tagAd, tagPortal))
+            .build(),
+        Bookmark.builder()
+            .title("다음")
+            .url("https://daum.net")
+            .memo("포털 사이트")
+            .member(member1)
+            .tags(Set.of(tagPortal))
+            .build(),
+        Bookmark.builder()
+            .title("네이버2")
+            .url("https://naver2.com")
+            .memo("포털2")
+            .member(member2)
+            .tags(Set.of(tagSearch))
+            .build()
+    );
 
-    Bookmark b2 = Bookmark.builder()
-        .title("구글")
-        .url("https://google.com")
-        .memo("검색 엔진")
-        .member(member1)
-        .tags(Set.of(tagSearch, tagAd, tagPortal))
-        .build();
-
-    Bookmark b3 = Bookmark.builder()
-        .title("다음")
-        .url("https://daum.net")
-        .memo("포털 사이트")
-        .member(member1)
-        .tags(Set.of(tagPortal))
-        .build();
-
-    Bookmark b4 = Bookmark.builder()
-        .title("네이버2")
-        .url("https://naver2.com")
-        .memo("포털2")
-        .member(member2)
-        .tags(Set.of(tagSearch))
-        .build();
-
-    bookmarkRepository.saveAll(List.of(b1, b2, b3, b4));
+    bookmarkRepository.saveAll(bookmarks);
   }
 
   @Test
@@ -145,6 +146,29 @@ class BookmarkApplicationTests {
 
     assertEquals(1, result.getContent().size());
     assertEquals("다음", result.getContent().get(0).getTitle());
+  }
+
+  @Test
+  void sortByCreatedAt() {
+    BookmarkCriteria criteria = new BookmarkCriteria();
+    criteria.setPage(0);
+    criteria.setSize(10);
+    criteria.setSort("createdAt");
+    criteria.setDirection("desc");
+
+    Page<BookmarkResponse> result = bookmarkService.getBookmarksPage(member1Id, criteria);
+
+    List<LocalDateTime> createdAts = result.getContent().stream()
+        .map(BookmarkResponse::getCreatedAt)
+        .toList();
+
+    for (LocalDateTime createdAt : createdAts) {
+      System.out.println(createdAt);
+    }
+
+    assertFalse(createdAts.get(0).isBefore(createdAts.get(1)));
+    assertFalse(createdAts.get(1).isBefore(createdAts.get(2)));
+
   }
 
   @Test
