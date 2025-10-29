@@ -8,13 +8,13 @@
 
 #### 목표
 
-- Swagger 문서 작성 과정의 반복을 줄이고, 효율적으로 API 문서를 작성할 수 있는 패턴 확보
+- **Swagger 문서 작성 과정의 반복을 줄이고**, 효율적으로 API 문서를 작성할 수 있는 패턴 확보
 
 #### 방법(프롬프트)
 
-- 하나의 API 코드(Controller -> Service)를 보여주고 AI에게 Swagger 문서를 작성하도록 지시
+- **하나의 API 코드(Controller -> Service)를 보여주고** AI에게 Swagger 문서를 작성하도록 지시
 - 프롬프트에서는 Swagger 문서에 `@Operation(summary,description)`과 `@ApiResponses`를 포함하도록 요구했으며, 정상 응답뿐만 아니라 **예외 상황에 대한 응답도 함께 기재하도록 명시**
-- 작성된 문서를 기반으로 AI가 생성한 Swagger 어노테이션을 다듬고, 동일한 방식으로 나머지 API에도 적용할 수 있도록 활용
+- 작성된 문서를 기반으로 AI가 생성한 Swagger 어노테이션을 다듬고, **동일한 방식으로 나머지 API에도 적용할 수 있도록 활용**
 
 
 ### 2. 로그인 구조
@@ -26,7 +26,7 @@
 #### 방법(프롬프트)
 
 - Spring Security를 사용하지 않고, 토이 프로젝트 수준으로 **세션 방식**을 활용한 로그인 구조 설계
-- `HttpSession`을 사용하여 로그인 성공 시 사용자 정보를 세션에 저장
+- `HttpSession`을 사용하여 **로그인 성공 시 사용자 정보를 세션에 저장**
 - `/bookmark` 경로 API 요청 시 **세션 검증을 통해 인증 처리**
 
 ### 3. 페이지네이션 기능
@@ -46,7 +46,7 @@
 #### 목표
 
 - 비지니스 로직 등 클라이언트의 잘못된 요청으로 발생할 수 있는 **예외를 공통으로 처리하고자 함**
-- DTO 필드에 대한 유효성 검사(`@NotBlank`) 실패 시 일관된 방식으로 응답 제공
+- **DTO 필드에 대한 유효성 검사**(`@NotBlank`) 실패 시 일관된 방식으로 응답 제공
 
 #### 방법(프롬프트)
 
@@ -65,17 +65,17 @@
 
 ### 2. 로그인 구조
 
-- Controller: org.example.bookmark`/controller/AuthController.java` (`login` 메서드)
-- Service: org.example.bookmark`/service/AuthService.java` (`login` 메서드)
+- **Controller:** org.example.bookmark`/controller/AuthController.java` (`login` 메서드)
+- **Service:** org.example.bookmark`/service/AuthService.java` (`login` 메서드)
 
 ### 3. 페이지네이션 기능
 
-- Service: org.example.bookmark`/service/BookmarkService.java` (`getBookmarksPage()` 메서드)
-- Configuration: org.example.bookmark`/common/config/QueryDSLConfig.java` (QueryDSL 설정)
+- **Service:** org.example.bookmark`/service/BookmarkService.java` (`getBookmarksPage()` 메서드)
+- **Configuration:** org.example.bookmark`/common/config/QueryDSLConfig.java` (QueryDSL 설정)
 
 ### 4. 예외 처리 방식
 
-- Exception Handler: org.example.bookmark`/common/exception/GlobalExceptionHandler.java`
+- **Exception Handler:** org.example.bookmark`/common/exception/GlobalExceptionHandler.java`
 
 ## ✏️ AI 생성물에 대해 직접 수정·검증한 부분 요약
 
