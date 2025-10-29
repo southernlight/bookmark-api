@@ -6,12 +6,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.example.bookmark.common.response.ApiResponse;
 import org.example.bookmark.dto.LoginRequest;
 import org.example.bookmark.dto.SignUpRequest;
 import org.springframework.http.ResponseEntity;
 
+@Tag(name = "Auth", description = "인증 관련 API")
 public interface AuthControllerDocs {
 
   @Operation(

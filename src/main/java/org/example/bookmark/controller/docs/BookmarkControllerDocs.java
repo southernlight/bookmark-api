@@ -41,6 +41,10 @@ public interface BookmarkControllerDocs {
           responseCode = "400",
           ref = "#/components/responses/MemberNotFound"
       ),
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
+          responseCode = "500",
+          ref = "#/components/responses/InternalServerError"
+      )
   })
   ResponseEntity<ApiResponse<BookmarkResponse>> registerBookmark(
       @RequestAttribute("LOGIN_MEMBER_ID") Long memberId,
