@@ -29,5 +29,6 @@ public class Member {
   private String password;
 
   @OneToMany(mappedBy = "member")
+  @Builder.Default
   private List<Bookmark> bookmarks = new ArrayList<>();
 }

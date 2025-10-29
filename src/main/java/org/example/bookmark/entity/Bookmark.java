@@ -57,6 +57,7 @@ public class Bookmark {
       joinColumns = @JoinColumn(name = "bookmark_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id")
   )
+  @Builder.Default
   private Set<Tag> tags = new HashSet<>();
 
   @ManyToOne
