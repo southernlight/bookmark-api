@@ -106,7 +106,7 @@ public class BookmarkService {
   @Transactional
   public BookmarkResponse getBookmarkById(Long memberId, Long bookmarkId) {
 
-    log.info("\uD83D\uDCCC DB에서 직접 조회함: memberId: {}, bookmarkId: {}", memberId, bookmarkId);
+    log.info("Fetched from DB: memberId: {}, bookmarkId: {}", memberId, bookmarkId);
 
     Bookmark bookmark = findBookmarkById(bookmarkId);
 
