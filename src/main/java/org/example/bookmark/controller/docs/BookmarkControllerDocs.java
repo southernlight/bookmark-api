@@ -33,14 +33,44 @@ public interface BookmarkControllerDocs {
           responseCode = "200",
           description = "북마크 등록 성공"
       ),
+
+      @io.swagger.v3.oas.annotations.responses.ApiResponse(
+          responseCode = "400",
+          description = "잘못된 요청",
+          content = @Content(
+              mediaType = "application/json",
+              examples = {
+                  @ExampleObject(
+                      name = "멤버 없음",
+                      description = "존재하지 않는 멤버 ID로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "멤버를 찾을 수 없습니다",
+                    "data": null
+                  }
+                  """
+                  ),
+                  @ExampleObject(
+                      name = "JSON 파싱 에러",
+                      description = "잘못된 JSON 형식으로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "요청 데이터가 유효하지 않습니다",
+                    "data": "JSON parse error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name"
+                  }
+                  """
+                  )
+              }
+          )
+      ),
+
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "401",
           ref = "#/components/responses/Unauthorized"
       ),
-      @io.swagger.v3.oas.annotations.responses.ApiResponse(
-          responseCode = "400",
-          ref = "#/components/responses/MemberNotFound"
-      ),
+
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "500",
           ref = "#/components/responses/InternalServerError"
@@ -145,7 +175,7 @@ public interface BookmarkControllerDocs {
       ),
       @io.swagger.v3.oas.annotations.responses.ApiResponse(
           responseCode = "400",
-          description = "북마크 ID 없음 또는 필수값 누락",
+          description = "잘못된 요청",
           content = @Content(
               mediaType = "application/json",
               examples = {
@@ -170,6 +200,28 @@ public interface BookmarkControllerDocs {
                           "data": null
                         }
                         """
+                  ),
+                  @ExampleObject(
+                      name = "JSON 파싱 에러",
+                      description = "잘못된 JSON 형식으로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "요청 데이터가 유효하지 않습니다",
+                    "data": "JSON parse error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name"
+                  }
+                  """
+                  ),
+                  @ExampleObject(
+                      name = "JSON 파싱 에러",
+                      description = "잘못된 JSON 형식으로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "요청 데이터가 유효하지 않습니다",
+                    "data": "JSON parse error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name"
+                  }
+                  """
                   )
               }
           )

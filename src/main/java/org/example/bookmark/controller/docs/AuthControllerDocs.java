@@ -48,10 +48,21 @@ public interface AuthControllerDocs {
                       value = """
                         {
                           "status": 400,
-                          "message": "email: 이메일은 필수입니다., password: 비밀번호는 필수입니다.",
-                          "data": null
+                          "message": "요청 데이터가 유효하지 않습니다",
+                          "data": "email: 이메일은 필수입니다., password: 비밀번호는 필수입니다."
                         }
-                        """)
+                        """),
+                  @ExampleObject(
+                      name = "JSON 파싱 에러",
+                      description = "잘못된 JSON 형식으로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "요청 데이터가 유효하지 않습니다",
+                    "data": "JSON parse error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name"
+                  }
+                  """
+                  )
               }
           )
       ),
@@ -103,6 +114,17 @@ public interface AuthControllerDocs {
                             "data": null
                           }
                           """
+                  ),
+                  @ExampleObject(
+                      name = "JSON 파싱 에러",
+                      description = "잘못된 JSON 형식으로 요청했을 때 발생하는 에러",
+                      value = """
+                  {
+                    "status": 400,
+                    "message": "요청 데이터가 유효하지 않습니다",
+                    "data": "JSON parse error: Unexpected character ('}' (code 125)): was expecting double-quote to start field name"
+                  }
+                  """
                   )
               }
           )
