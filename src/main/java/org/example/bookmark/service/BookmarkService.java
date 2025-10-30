@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.bookmark.common.mapper.BookmarkMapper;
 import org.example.bookmark.common.exception.BusinessException;
 import org.example.bookmark.common.exception.ErrorCode;
@@ -24,6 +25,8 @@ import org.example.bookmark.entity.Tag;
 import org.example.bookmark.repository.BookmarkRepository;
 import org.example.bookmark.repository.MemberRepository;
 import org.example.bookmark.repository.TagRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookmarkService {
 
   private final BookmarkRepository bookmarkRepository;
@@ -98,8 +102,11 @@ public class BookmarkService {
     return new PageImpl<>(bookmarkResponseList,pageable,total);
   }
 
+  @Cacheable(value = "bookmarkCache",key = "#memberId + '_' + #bookmarkId")
   @Transactional
   public BookmarkResponse getBookmarkById(Long memberId, Long bookmarkId) {
+
+    log.info("\uD83D\uDCCC DB에서 직접 조회함: memberId: {}, bookmarkId: {}", memberId, bookmarkId);
 
     Bookmark bookmark = findBookmarkById(bookmarkId);
 
@@ -108,6 +115,7 @@ public class BookmarkService {
     return BookmarkMapper.toBookmarkResponse(bookmark);
   }
 
+  @CacheEvict(value = "bookmarkCache", key = "#memberId + '_' + #bookmarkId")
   @Transactional
   public BookmarkResponse updateBookmark(Long memberId,Long bookmarkId, BookmarkRequest request) {
 
@@ -126,6 +134,7 @@ public class BookmarkService {
     return BookmarkMapper.toBookmarkResponse(updatedBookmark);
   }
 
+  @CacheEvict(value = "bookmarkCache", key = "#memberId + '_' + #bookmarkId")
   @Transactional
   public void deleteBookmark(Long memberId ,Long bookmarkId) {
 
