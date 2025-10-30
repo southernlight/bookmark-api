@@ -127,7 +127,7 @@ public interface BookmarkControllerDocs {
   );
 
   @Operation(
-      summary = "북마크 상세 조회",
+      summary = "북마크 상세 조회(캐시 사용)",
       description = """
         북마크 ID로 특정 북마크를 조회합니다.<br><br>
         
